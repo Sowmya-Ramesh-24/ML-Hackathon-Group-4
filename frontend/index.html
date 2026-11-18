@@ -25,49 +25,64 @@
   <main class="layout">
     <aside class="sidebar">
       <section class="panel">
-        <h2>About</h2>
-        <p class="about-text">
-          PathSnap snaps noisy GPS traces to the road network. A machine-learning
-          model scores candidate road segments for each GPS point, then an HMM
-          with Viterbi decoding picks the most plausible continuous route.
-        </p>
-        <ol class="pipeline-list">
-          <li>GPS observations + candidates</li>
-          <li>ML match scores (p_match)</li>
-          <li>HMM / Viterbi decode</li>
-          <li>Route stretches on the map</li>
-        </ol>
-      </section>
-
-      <section class="panel">
-        <h2>Trips <span id="trip-count" class="pill">0</span></h2>
-        <p class="hint">Select a trip, then run matching.</p>
-        <div id="trip-list" class="trip-list">
-          <div class="empty-state">Loading trips...</div>
+        <div class="step">
+          <div class="step-head">
+            <span class="step-num">1</span>
+            <h2>Select a trip <span id="trip-count" class="pill">0</span></h2>
+          </div>
+          <div id="trip-list" class="trip-list">
+            <div class="empty-state">Loading trips...</div>
+          </div>
         </div>
-        <button id="run-btn" class="run-btn" disabled>Run map matching</button>
+
+        <div class="step">
+          <div class="step-head">
+            <span class="step-num">2</span>
+            <h2>Run map matching</h2>
+          </div>
+          <button id="run-btn" class="run-btn" disabled>Run map matching</button>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <span class="step-num">3</span>
+            <h2>Evaluate</h2>
+          </div>
+          <button id="eval-btn" class="eval-btn" disabled>Evaluate (server-side)</button>
+          <p class="hint">Reference routes stay on the server and are only revealed after a prediction.</p>
+        </div>
       </section>
 
       <section class="panel" id="eval-panel">
-        <h2>Evaluation</h2>
+        <h2 class="panel-title">Results</h2>
         <div id="eval-body" class="eval-body">
-          <div class="empty-state">Run a trip, then request evaluation.</div>
+          <div class="empty-state">Run a trip, then evaluate to see metrics here.</div>
         </div>
-        <button id="eval-btn" class="eval-btn" disabled>Evaluate (server-side)</button>
-        <p class="hint">Reference routes stay on the server and are only used
-        after a prediction exists.</p>
       </section>
+
+      <details class="panel about-panel">
+        <summary>How it works</summary>
+        <ol class="pipeline-list">
+          <li>GPS observations + candidate road segments</li>
+          <li>ML match scores (p_match)</li>
+          <li>HMM / Viterbi decoding</li>
+          <li>Continuous route stretches on the map</li>
+        </ol>
+      </details>
     </aside>
 
     <section class="map-wrap">
       <div id="map"></div>
       <div id="map-empty" class="map-empty">
-        <p>Select a trip and run map matching to see the route.</p>
+        <div class="map-empty-card">
+          <p class="map-empty-title">No route yet</p>
+          <p>Select a trip on the left, then press <strong>Run map matching</strong>.</p>
+        </div>
       </div>
       <div id="legend" class="legend hidden">
         <div><span class="swatch swatch-gps"></span> GPS observations</div>
-        <div><span class="swatch swatch-route"></span> Predicted route stretch</div>
-        <div><span class="swatch swatch-ref"></span> Reference route (post-evaluation)</div>
+        <div><span class="swatch swatch-route"></span> Predicted route</div>
+        <div><span class="swatch swatch-ref"></span> Reference route (after evaluation)</div>
         <div><span class="swatch swatch-gap"></span> GPS gap (no line drawn)</div>
       </div>
     </section>
