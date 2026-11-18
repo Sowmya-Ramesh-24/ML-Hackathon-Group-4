@@ -141,4 +141,15 @@ class RealPipeline(MatchingPipeline):
 
         helper = MockPipeline.__new__(MockPipeline)
         helper._arcs = trip.arcs
+        # Install the trip's real road graph (directed, from the team network
+        # data) so intermediate-arc reconstruction uses the same BFS rules as
+        # the mock pipeline but over actual arcs.
+        adjacency: dict = {}
+        edge_arc: dict = {}
+        for aid, arc in trip.arcs.items():
+            u, v = arc["nodes"]
+            adjacency.setdefault(u, []).append(v)
+            edge_arc.setdefault((u, v), aid)
+        helper._graph_neighbors = lambda node: adjacency.get(node, [])
+        helper._graph_arc_between = lambda u, v: edge_arc.get((u, v))
         return MockPipeline.build_stretches(helper, trip, predictions)
