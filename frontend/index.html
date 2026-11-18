@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathSnap - Intelligent GPS Map Matching</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">&#9678;</span>
+      <div>
+        <h1>PathSnap</h1>
+        <p class="tagline">Intelligent GPS Map Matching</p>
+      </div>
+    </div>
+    <div class="status-area">
+      <span id="mode-badge" class="badge hidden"></span>
+      <span id="conn-status" class="conn conn-unknown">Backend: checking...</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>About</h2>
+        <p class="about-text">
+          PathSnap snaps noisy GPS traces to the road network. A machine-learning
+          model scores candidate road segments for each GPS point, then an HMM
+          with Viterbi decoding picks the most plausible continuous route.
+        </p>
+        <ol class="pipeline-list">
+          <li>GPS observations + candidates</li>
+          <li>ML match scores (p_match)</li>
+          <li>HMM / Viterbi decode</li>
+          <li>Route stretches on the map</li>
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h2>Trips <span id="trip-count" class="pill">0</span></h2>
+        <p class="hint">Select a trip, then run matching.</p>
+        <div id="trip-list" class="trip-list">
+          <div class="empty-state">Loading trips...</div>
+        </div>
+        <button id="run-btn" class="run-btn" disabled>Run map matching</button>
+      </section>
+
+      <section class="panel" id="eval-panel">
+        <h2>Evaluation</h2>
+        <div id="eval-body" class="eval-body">
+          <div class="empty-state">Run a trip, then request evaluation.</div>
+        </div>
+        <button id="eval-btn" class="eval-btn" disabled>Evaluate (server-side)</button>
+        <p class="hint">Reference routes stay on the server and are only used
+        after a prediction exists.</p>
+      </section>
+    </aside>
+
+    <section class="map-wrap">
+      <div id="map"></div>
+      <div id="map-empty" class="map-empty">
+        <p>Select a trip and run map matching to see the route.</p>
+      </div>
+      <div id="legend" class="legend hidden">
+        <div><span class="swatch swatch-gps"></span> GPS observations</div>
+        <div><span class="swatch swatch-route"></span> Predicted route stretch</div>
+        <div><span class="swatch swatch-ref"></span> Reference route (post-evaluation)</div>
+        <div><span class="swatch swatch-gap"></span> GPS gap (no line drawn)</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <div id="spinner" class="spinner-overlay hidden"><div class="spinner"></div><p id="spinner-text">Processing...</p></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
