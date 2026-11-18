@@ -103,14 +103,19 @@ def _neighbors(node: tuple[int, int]) -> list[tuple[int, int]]:
     return out
 
 
-def _bfs_path(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int]] | None:
+def _bfs_path(start, goal, neighbors=None) -> list | None:
+    """BFS shortest path over an arbitrary node graph. `neighbors` defaults
+    to the mock grid's 4-connectivity; the real pipeline passes an adjacency
+    built from the trip's actual road-network arcs."""
+    if neighbors is None:
+        neighbors = _neighbors
     if start == goal:
         return [start]
     prev = {start: None}
     q = deque([start])
     while q:
         cur = q.popleft()
-        for nxt in _neighbors(cur):
+        for nxt in neighbors(cur):
             if nxt not in prev:
                 prev[nxt] = cur
                 if nxt == goal:
@@ -388,17 +393,24 @@ class MockPipeline(MatchingPipeline):
     def _intermediate_arcs(self, a: str, b: str) -> list[str]:
         na = self._arcs[a]["nodes"]
         nb = self._arcs[b]["nodes"]
-        best_path: list[tuple[int, int]] | None = None
+        # Graph hooks: default to the mock grid; the real pipeline installs
+        # adjacency/arc lookups built from the trip's actual arcs.
+        neighbors = getattr(self, "_graph_neighbors", None) or _neighbors
+        arc_between = getattr(self, "_graph_arc_between", None) or _arc_between
+        best_path: list | None = None
         for x in na:
             for y in nb:
-                p = _bfs_path(x, y)
+                p = _bfs_path(x, y, neighbors)
                 if p is not None and (best_path is None or len(p) < len(best_path)):
                     best_path = p
         if not best_path or len(best_path) < 3:
             return []  # adjacent or identical - nothing to reconstruct
         mids = []
         for u, v in zip(best_path[1:-2], best_path[2:-1]):
-            mids.append(_arc_between(u, v))
+            arc = arc_between(u, v)
+            if arc is None:
+                return []  # no real arc on this edge - leave unreconstructed
+            mids.append(arc)
         return mids
 
     @staticmethod
