@@ -172,20 +172,23 @@
 
   function renderEvaluation(body) {
     var m = body.metrics;
-    function row(label, value) {
-      return "<tr><td>" + label + "</td><td>" + (value === null || value === undefined ? "n/a" : value) + "</td></tr>";
+    function pct(v) { return v === null || v === undefined ? "n/a" : (v * 100).toFixed(1) + "%"; }
+    function num(v, digits) { return v === null || v === undefined ? "n/a" : v.toFixed(digits); }
+    function card(label, value, hero) {
+      return '<div class="metric-card' + (hero ? " hero" : "") + '">' +
+        '<div class="m-label">' + label + '</div>' +
+        '<div class="m-value">' + value + "</div></div>";
     }
-    function pct(v) { return v === null || v === undefined ? null : (v * 100).toFixed(1) + "%"; }
     els.evalBody.innerHTML =
-      "<table>" +
-      row("Top-1 accuracy", pct(m.top1_accuracy)) +
-      row("Candidate recall", pct(m.candidate_recall)) +
-      row("Matched fraction", pct(m.matched_fraction)) +
-      row("Predicted stretches", m.num_predicted_stretches) +
-      row("Continuity ratio", m.continuity_ratio === null ? null : m.continuity_ratio.toFixed(3)) +
-      row("Processing time", m.processing_time_ms.toFixed(1) + " ms") +
-      "</table>" +
-      '<p class="hint">' + body.note + "</p>";
+      '<div class="metric-grid">' +
+      card("Top-1 accuracy", pct(m.top1_accuracy), true) +
+      card("Matched fraction", pct(m.matched_fraction)) +
+      card("Candidate recall", pct(m.candidate_recall)) +
+      card("Route stretches", m.num_predicted_stretches) +
+      card("Continuity", num(m.continuity_ratio, 3)) +
+      card("Processing time", m.processing_time_ms.toFixed(1) + " ms") +
+      "</div>" +
+      '<p class="note">' + body.note + "</p>";
 
     if (body.reference_geometry && body.reference_geometry.length) {
       if (layers.ref) map.removeLayer(layers.ref);
