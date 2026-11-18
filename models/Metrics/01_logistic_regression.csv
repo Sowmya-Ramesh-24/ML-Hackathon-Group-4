@@ -1,0 +1,2 @@
+model,cv_macro_f1,student_top1_with_candidates,student_candidate_macro_f1,log_loss,inference_seconds
+01_logistic_regression,0.9010180763118398,0.8569937369519833,0.9071435978479276,0.07584251904303362,0.16682689900005698

@@ -1,0 +1,2 @@
+model,cv_macro_f1,student_top1_with_candidates,student_candidate_macro_f1,log_loss,inference_seconds
+02_gaussian_nb,0.8252935033680322,0.8254175365344467,0.8178092260176788,0.5421963250316014,0.08967307599994001
