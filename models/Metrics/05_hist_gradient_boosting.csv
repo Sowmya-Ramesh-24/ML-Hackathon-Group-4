@@ -1,0 +1,2 @@
+model,cv_macro_f1,student_top1_with_candidates,student_candidate_macro_f1,log_loss,inference_seconds
+05_hist_gradient_boosting,0.92323102510483,0.8724425887265136,0.9277507695127087,0.05501926096992735,1.9725491789999978

@@ -1,0 +1,2 @@
+model,cv_macro_f1,student_top1_with_candidates,student_candidate_macro_f1,log_loss,inference_seconds
+03_decision_tree,0.9169645269514823,0.8709290187891441,0.9259871037094858,0.08773464081778831,0.08223103099999207
