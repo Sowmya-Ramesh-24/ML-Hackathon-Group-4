@@ -44,11 +44,53 @@ python -m http.server 8080
 
 No build step, no npm: plain HTML/JS + Leaflet from CDN.
 
-## Switching to the real pipeline
+## Running the real pipeline (team mode)
+
+The integration bridge `backend/app/pipeline/teammates_bridge.py` wires the
+team's actual artifacts into the backend without re-implementing anyone's
+work:
+
+- Person 1 data: `data/student_test/<trip>/<trip>.{track,nodes,arcs,route}`
+  plus `data/candidates/student_test_candidates.csv` and
+  `student_test_references.csv`
+- Person 2 model: `models/selected_pipeline.joblib` (tuned
+  HistGradientBoosting pipeline, loaded once)
+- Person 3 decoder: `src/decoder.py` (imported and called verbatim)
+
+Before starting, make sure these are present in the repo root:
+
+1. `data/student_test/` - extract the student_test zip into `data/` so the
+   path is `data/student_test/<trip_id>/<trip_id>.track` etc.
+2. `models/selected_pipeline.joblib` - the trained model file shared by
+   Person 2.
+
+Then:
+
+```bash
+cd backend
+pip install -r requirements.txt   # adds numpy/pandas/scikit-learn/joblib
+
+# Linux/macOS:
+PATHSNAP_MODE=real PATHSNAP_TEAMMATES_MODULE=app.pipeline.teammates_bridge python run.py
+
+# Windows PowerShell:
+$env:PATHSNAP_MODE='real'; $env:PATHSNAP_TEAMMATES_MODULE='app.pipeline.teammates_bridge'; python run.py
+```
+
+The scikit-learn version is pinned to the one the model was trained with, so
+the pickle loads cleanly.
+
+Verified against the team's own outputs: bridge scores match the shared
+candidate-scores CSV exactly (max abs diff ~1e-16), decoder output matches
+the shared decoder JSON on every observation, and combined Top-1 across all
+ten student-test trips is 88.1% (19,160 points) vs the team's reported
+88.07%.
+
+### Generic adapter (if the team swaps in a different module)
 
 ```bash
 export PATHSNAP_MODE=real
-export PATHSNAP_TEAMMATES_MODULE=teammates_pipeline
+export PATHSNAP_TEAMMATES_MODULE=teammates_pipeline   # import name or .py path
 python run.py
 ```
 
